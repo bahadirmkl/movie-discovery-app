@@ -2,6 +2,7 @@ import { getMovie, getImageUrl } from "@/lib/tmdb";
 import MovieCard from "@/components/movie/MovieCard";
 import { Star, Calendar, Clock } from "lucide-react";
 import { Metadata } from "next";
+import Link from "next/link";
 import FavoriteButton from "@/components/movie/FavoriteButton";
 import { getIsFavorited } from "@/app/actions";
 import { createClient } from "@/lib/supabase/server";
@@ -96,19 +97,19 @@ export default async function MoviePage({ params }: PageProps) {
                     <h2 className="text-2xl font-bold mb-6">Top Cast</h2>
                     <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                         {movie.credits.cast.slice(0, 10).map(actor => (
-                            <div key={actor.id} className="min-w-[140px] w-[140px] space-y-2">
+                            <Link href={`/person/${actor.id}`} key={actor.id} className="min-w-[140px] w-[140px] space-y-2 group">
                                 <div className="aspect-[2/3] rounded-lg overflow-hidden bg-muted">
                                     <img
                                         src={getImageUrl(actor.profile_path)}
                                         alt={actor.name}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
                                     />
                                 </div>
                                 <div className="text-sm">
-                                    <p className="font-semibold line-clamp-1">{actor.name}</p>
+                                    <p className="font-semibold line-clamp-1 group-hover:text-primary transition-colors">{actor.name}</p>
                                     <p className="text-muted-foreground text-xs line-clamp-1">{actor.character}</p>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </section>

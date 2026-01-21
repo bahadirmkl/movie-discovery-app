@@ -32,6 +32,18 @@ export interface Genre {
     name: string;
 }
 
+export interface PersonDetails {
+    id: number;
+    name: string;
+    biography: string;
+    birthday: string | null;
+    place_of_birth: string | null;
+    profile_path: string | null;
+    movie_credits: {
+        cast: Movie[];
+    };
+}
+
 // Helper for caching strategy (Next.js default fetch cache serves well for this MVP)
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
     const query = new URLSearchParams({
@@ -83,6 +95,13 @@ export async function getMoviesByGenre(genreId: string, page: number = 1): Promi
         page: page.toString()
     });
     return data.results;
+}
+
+export async function getPerson(id: string): Promise<PersonDetails> {
+    const data = await fetchTMDB(`/person/${id}`, {
+        append_to_response: 'movie_credits',
+    });
+    return data;
 }
 
 export function getImageUrl(path: string | null, size: 'w500' | 'original' = 'w500') {

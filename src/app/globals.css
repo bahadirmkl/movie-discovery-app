@@ -119,9 +119,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   .container {
     @apply mx-auto px-4;
   }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
