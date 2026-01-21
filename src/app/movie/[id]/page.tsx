@@ -4,9 +4,11 @@ import { Star, Calendar, Clock } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import FavoriteButton from "@/components/movie/FavoriteButton";
-import { getIsFavorited } from "@/app/actions";
+import { getIsFavorited, getReviews } from "@/app/actions";
 import { createClient } from "@/lib/supabase/server";
 import VideoDialog from "@/components/movie/VideoDialog";
+import ReviewForm from "@/components/movie/ReviewForm";
+import ReviewList from "@/components/movie/ReviewList";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -31,6 +33,7 @@ export default async function MoviePage({ params }: PageProps) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const isFavorited = await getIsFavorited(movie.id);
+    const reviews = await getReviews(movie.id);
 
     return (
         <div className="min-h-screen pb-12">
@@ -125,6 +128,19 @@ export default async function MoviePage({ params }: PageProps) {
                         </div>
                     </section>
                 )}
+
+                {/* Reviews Section */}
+                <section className="max-w-3xl mx-auto">
+                    <h2 className="text-2xl font-bold mb-6">Reviews & Ratings</h2>
+
+                    {user && (
+                        <div className="mb-8">
+                            <ReviewForm movieId={movie.id} />
+                        </div>
+                    )}
+
+                    <ReviewList reviews={reviews} />
+                </section>
             </div>
         </div>
     );

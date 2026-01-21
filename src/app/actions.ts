@@ -69,3 +69,39 @@ export async function getIsFavorited(movieId: number) {
 
     return !!data
 }
+
+export async function addReview(movieId: number, rating: number, comment: string) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        throw new Error('User must be logged in to review')
+    }
+
+    const { error } = await supabase
+        .from('reviews')
+        .insert({
+            user_id: user.id,
+            movie_id: movieId,
+            rating,
+            comment,
+            user_email: user.email,
+        })
+
+    if (error) throw new Error(error.message)
+
+    revalidatePath(`/movie/${movieId}`)
+    return { success: true }
+}
+
+export async function getReviews(movieId: number) {
+    const supabase = await createClient()
+
+    const { data } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('movie_id', movieId)
+        .order('created_at', { ascending: false })
+
+    return data || []
+}
