@@ -22,6 +22,9 @@ export interface MovieDetails extends Movie {
     similar: {
         results: Movie[];
     };
+    videos: {
+        results: { key: string; name: string; type: string; site: string }[];
+    };
 }
 
 export interface Genre {
@@ -59,7 +62,7 @@ export async function getTrendingMovies(page: number = 1): Promise<Movie[]> {
 
 export async function getMovie(id: string): Promise<MovieDetails> {
     const data = await fetchTMDB(`/movie/${id}`, {
-        append_to_response: 'credits,similar',
+        append_to_response: 'credits,similar,videos',
     });
     return data;
 }

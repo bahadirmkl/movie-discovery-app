@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import FavoriteButton from "@/components/movie/FavoriteButton";
 import { getIsFavorited } from "@/app/actions";
 import { createClient } from "@/lib/supabase/server";
+import VideoDialog from "@/components/movie/VideoDialog";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -74,7 +75,7 @@ export default async function MoviePage({ params }: PageProps) {
 
                         <p className="text-lg leading-relaxed">{movie.overview}</p>
 
-                        <div className="pt-4">
+                        <div className="pt-4 flex gap-4">
                             <FavoriteButton
                                 movieId={movie.id}
                                 title={movie.title}
@@ -82,6 +83,7 @@ export default async function MoviePage({ params }: PageProps) {
                                 initialIsFavorited={isFavorited}
                                 isLoggedIn={!!user}
                             />
+                            <VideoDialog videos={movie.videos?.results || []} />
                         </div>
 
                     </div>
