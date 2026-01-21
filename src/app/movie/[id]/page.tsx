@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import VideoDialog from "@/components/movie/VideoDialog";
 import ReviewForm from "@/components/movie/ReviewForm";
 import ReviewList from "@/components/movie/ReviewList";
+import LogMovieDialog from "@/components/movie/LogMovieDialog";
+import AddToListDialog from "@/components/lists/AddToListDialog";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -87,6 +89,16 @@ export default async function MoviePage({ params }: PageProps) {
                                 initialIsFavorited={isFavorited}
                                 isLoggedIn={!!user}
                             />
+                            <LogMovieDialog movie={{
+                                id: movie.id,
+                                title: movie.title,
+                                poster_path: movie.poster_path
+                            }} />
+                            <AddToListDialog movie={{
+                                id: movie.id,
+                                title: movie.title,
+                                poster_path: movie.poster_path
+                            }} />
                             <VideoDialog videos={movie.videos?.results || []} />
                         </div>
 

@@ -46,6 +46,15 @@ export default function UserNav({ user }: { user: User }) {
                 <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
                     My Profile
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/feed')} className="cursor-pointer">
+                    Activity Feed
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/diary')} className="cursor-pointer">
+                    My Diary
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/lists')} className="cursor-pointer">
+                    My Lists
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/favorites')} className="cursor-pointer">
                     My Favorites
                 </DropdownMenuItem>

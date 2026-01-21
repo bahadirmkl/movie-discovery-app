@@ -122,7 +122,111 @@ export async function getRandomMovieId() {
         }
         return null;
     } catch (error) {
-        console.error("Random picker error:", error);
         return null;
     }
+}
+
+export async function logMovie(movie: { id: number; title: string; poster_path: string }, rating: number, review: string, date: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) throw new Error('Must be logged in to log movies')
+
+    const { error } = await supabase
+        .from('diary')
+        .insert({
+            user_id: user.id,
+            movie_id: movie.id,
+            movie_title: movie.title,
+            movie_poster_path: movie.poster_path,
+            rating,
+            review,
+            watched_on: date
+        })
+
+    if (error) throw new Error(error.message)
+
+    revalidatePath('/diary')
+    revalidatePath(`/movie/${movie.id}`)
+    return { success: true }
+}
+
+export async function getDiaryLogs(userId?: string) {
+    const supabase = await createClient()
+    let query = supabase.from('diary').select('*').order('watched_on', { ascending: false })
+
+    if (userId) {
+        query = query.eq('user_id', userId)
+    } else {
+        // If no userId, get current user's diary
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) query = query.eq('user_id', user.id)
+        else return []
+    }
+
+    const { data } = await query
+    return data || []
+}
+
+export async function createList(title: string, description: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Must be logged in')
+
+    const { error } = await supabase
+        .from('lists')
+        .insert({
+            user_id: user.id,
+            title,
+            description
+        })
+
+    if (error) throw new Error(error.message)
+    revalidatePath('/lists')
+    return { success: true }
+}
+
+export async function getUserLists() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data } = await supabase
+        .from('lists')
+        .select('*, list_items(count)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+    return data || []
+}
+
+export async function addMovieToList(listId: number, movie: { id: number; title: string; poster_path: string }) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Must be logged in')
+
+    const { data: list } = await supabase
+        .from('lists')
+        .select('user_id')
+        .eq('id', listId)
+        .single()
+
+    if (!list || list.user_id !== user.id) throw new Error('Unauthorized')
+
+    const { error } = await supabase
+        .from('list_items')
+        .insert({
+            list_id: listId,
+            movie_id: movie.id,
+            movie_title: movie.title,
+            movie_poster_path: movie.poster_path
+        })
+
+    if (error) {
+        if (error.code === '23505') return { success: false, message: 'Movie already in list' }
+        throw new Error(error.message)
+    }
+
+    revalidatePath('/lists')
+    return { success: true }
 }
