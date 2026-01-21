@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/server";
 import UserNav from "./UserNav";
+import SearchInput from "@/components/search/SearchInput";
 
 export default async function Header() {
     const supabase = await createClient();
@@ -54,13 +55,7 @@ export default async function Header() {
                 </Sheet>
                 <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
                     <div className="w-full flex-1 md:w-auto md:flex-none">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search movies..."
-                                className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-                            />
-                        </div>
+                        <SearchInput />
                     </div>
                     <nav className="flex items-center space-x-2">
                         {user ? (

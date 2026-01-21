@@ -43,6 +43,9 @@ export default function UserNav({ user }: { user: User }) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/favorites')} className="cursor-pointer">
+                    My Favorites
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                     Log out
                 </DropdownMenuItem>

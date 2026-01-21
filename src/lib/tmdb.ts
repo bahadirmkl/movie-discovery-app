@@ -24,6 +24,12 @@ export interface MovieDetails extends Movie {
     };
 }
 
+export interface Genre {
+    id: number;
+    name: string;
+}
+
+// Helper for caching strategy (Next.js default fetch cache serves well for this MVP)
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
     const query = new URLSearchParams({
         api_key: API_KEY!,
@@ -32,7 +38,11 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
     });
 
     const res = await fetch(`${BASE_URL}${endpoint}?${query}`, {
-        next: { revalidate: 3600 }, // Cache for 1 hour
+        // For pagination to feel dynamic, we might want to reduce cache time or depend on searchParams
+        // But standard fetch behavior in server components is per-request unless cached.
+        // 'force-cache' is default if not specified in some versions.
+        // We stick to simple validation
+        next: { revalidate: 3600 },
     });
 
     if (!res.ok) {
@@ -42,8 +52,8 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
     return res.json();
 }
 
-export async function getTrendingMovies(): Promise<Movie[]> {
-    const data = await fetchTMDB('/trending/movie/week');
+export async function getTrendingMovies(page: number = 1): Promise<Movie[]> {
+    const data = await fetchTMDB('/trending/movie/week', { page: page.toString() });
     return data.results;
 }
 
@@ -56,6 +66,19 @@ export async function getMovie(id: string): Promise<MovieDetails> {
 
 export async function searchMovies(query: string): Promise<Movie[]> {
     const data = await fetchTMDB('/search/movie', { query });
+    return data.results;
+}
+
+export async function getGenres(): Promise<Genre[]> {
+    const data = await fetchTMDB('/genre/movie/list');
+    return data.genres;
+}
+
+export async function getMoviesByGenre(genreId: string, page: number = 1): Promise<Movie[]> {
+    const data = await fetchTMDB('/discover/movie', {
+        with_genres: genreId,
+        page: page.toString()
+    });
     return data.results;
 }
 
