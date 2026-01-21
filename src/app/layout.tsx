@@ -18,6 +18,11 @@ import Footer from "@/components/layout/Footer";
 export const metadata: Metadata = {
   title: "Movie Discovery App",
   description: "Find your next favorite movie",
+  manifest: "/manifest.json",
+};
+
+export const viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

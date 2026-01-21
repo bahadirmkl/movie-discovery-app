@@ -44,6 +44,14 @@ export interface PersonDetails {
     };
 }
 
+export interface DiscoverParams {
+    year?: string;
+    minRating?: string;
+    withGenres?: string;
+    page?: string;
+    query?: string;
+}
+
 // Helper for caching strategy (Next.js default fetch cache serves well for this MVP)
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
     const query = new URLSearchParams({
@@ -53,10 +61,6 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
     });
 
     const res = await fetch(`${BASE_URL}${endpoint}?${query}`, {
-        // For pagination to feel dynamic, we might want to reduce cache time or depend on searchParams
-        // But standard fetch behavior in server components is per-request unless cached.
-        // 'force-cache' is default if not specified in some versions.
-        // We stick to simple validation
         next: { revalidate: 3600 },
     });
 
@@ -107,4 +111,19 @@ export async function getPerson(id: string): Promise<PersonDetails> {
 export function getImageUrl(path: string | null, size: 'w500' | 'original' = 'w500') {
     if (!path) return '/placeholder-movie.jpg'; // You might want to add a placeholder image
     return `https://image.tmdb.org/t/p/${size}${path}`;
+}
+
+export async function discoverMovies(params: DiscoverParams): Promise<Movie[]> {
+    const queryParams: Record<string, string> = {};
+
+    if (params.year) queryParams['primary_release_year'] = params.year;
+    if (params.minRating) queryParams['vote_average.gte'] = params.minRating;
+    if (params.withGenres) queryParams['with_genres'] = params.withGenres;
+    if (params.page) queryParams['page'] = params.page;
+
+    queryParams['sort_by'] = 'popularity.desc';
+    queryParams['vote_count.gte'] = '100';
+
+    const data = await fetchTMDB('/discover/movie', queryParams);
+    return data.results;
 }

@@ -43,6 +43,9 @@ export default function UserNav({ user }: { user: User }) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
+                    My Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/favorites')} className="cursor-pointer">
                     My Favorites
                 </DropdownMenuItem>

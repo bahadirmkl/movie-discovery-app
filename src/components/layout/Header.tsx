@@ -10,10 +10,14 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import UserNav from "./UserNav";
 import SearchInput from "@/components/search/SearchInput";
+import GenreFilter from "@/components/movie/GenreFilter";
+import RandomPickerButton from "@/components/movie/RandomPickerButton";
+import { getGenres } from "@/lib/tmdb";
 
 export default async function Header() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    const genres = await getGenres();
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,6 +62,10 @@ export default async function Header() {
                         <SearchInput />
                     </div>
                     <nav className="flex items-center space-x-2">
+                        <div className="hidden md:block">
+                            <GenreFilter genres={genres} />
+                        </div>
+                        <RandomPickerButton />
                         {user ? (
                             <UserNav user={user} />
                         ) : (

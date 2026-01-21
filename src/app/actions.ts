@@ -105,3 +105,24 @@ export async function getReviews(movieId: number) {
 
     return data || []
 }
+
+export async function getRandomMovieId() {
+    // Fetch a random page from 1 to 500 (TMDB limit)
+    const randomPage = Math.floor(Math.random() * 500) + 1;
+    const apiKey = process.env.TMDB_API_KEY;
+    const baseUrl = process.env.NEXT_PUBLIC_TMDB_BASE_URL;
+
+    try {
+        const res = await fetch(`${baseUrl}/discover/movie?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&vote_count.gte=100&page=${randomPage}`, { next: { revalidate: 0 } }); // No cache for random
+        const data = await res.json();
+
+        if (data.results && data.results.length > 0) {
+            const randomMovieIndex = Math.floor(Math.random() * data.results.length);
+            return data.results[randomMovieIndex].id;
+        }
+        return null;
+    } catch (error) {
+        console.error("Random picker error:", error);
+        return null;
+    }
+}

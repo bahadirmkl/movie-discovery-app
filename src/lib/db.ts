@@ -21,7 +21,34 @@ export async function getFavorites() {
         id: f.movie_id,
         title: f.movie_title,
         poster_path: f.movie_poster_path,
-        release_date: "", // We didn't store this, but MovieCard handles missing dates gracefully or we could update schema
-        vote_average: 0, // We didn't store this
+        release_date: "",
+        vote_average: 0,
     }));
+}
+
+export async function getUserStats(userId: string) {
+    const supabase = await createClient()
+
+    const { count: favoritesCount } = await supabase
+        .from('favorites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+    const { count: reviewsCount } = await supabase
+        .from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+    const { data: recentReviews } = await supabase
+        .from('reviews')
+        .select('*, movie_id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+    return {
+        favoritesCount: favoritesCount || 0,
+        reviewsCount: reviewsCount || 0,
+        recentReviews: recentReviews || []
+    }
 }
