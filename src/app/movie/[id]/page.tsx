@@ -1,4 +1,4 @@
-import { getMovie, getImageUrl } from "@/lib/tmdb";
+import { getMovie, getImageUrl, getMovieWatchProviders } from "@/lib/tmdb";
 import MovieCard from "@/components/movie/MovieCard";
 import { Star, Calendar, Clock } from "lucide-react";
 import { Metadata } from "next";
@@ -11,6 +11,7 @@ import ReviewForm from "@/components/movie/ReviewForm";
 import ReviewList from "@/components/movie/ReviewList";
 import LogMovieDialog from "@/components/movie/LogMovieDialog";
 import AddToListDialog from "@/components/lists/AddToListDialog";
+import WatchProviders from "@/components/movie/WatchProviders";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -36,6 +37,7 @@ export default async function MoviePage({ params }: PageProps) {
     const { data: { user } } = await supabase.auth.getUser();
     const isFavorited = await getIsFavorited(movie.id);
     const reviews = await getReviews(movie.id);
+    const providers = await getMovieWatchProviders(id);
 
     return (
         <div className="min-h-screen pb-12">
@@ -101,6 +103,8 @@ export default async function MoviePage({ params }: PageProps) {
                             }} />
                             <VideoDialog videos={movie.videos?.results || []} />
                         </div>
+
+                        <WatchProviders providers={providers} />
 
                     </div>
                 </div>

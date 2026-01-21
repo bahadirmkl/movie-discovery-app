@@ -127,3 +127,22 @@ export async function discoverMovies(params: DiscoverParams): Promise<Movie[]> {
     const data = await fetchTMDB('/discover/movie', queryParams);
     return data.results;
 }
+
+export interface WatchProvider {
+    provider_id: number;
+    provider_name: string;
+    logo_path: string;
+}
+
+export interface WatchProvidersResult {
+    link: string;
+    flatrate?: WatchProvider[];
+    rent?: WatchProvider[];
+    buy?: WatchProvider[];
+}
+
+export async function getMovieWatchProviders(id: string): Promise<WatchProvidersResult | null> {
+    const data = await fetchTMDB(`/movie/${id}/watch/providers`);
+    // Default to Turkey (TR), fallback to US if TR not available, or null
+    return data.results?.['TR'] || data.results?.['US'] || null;
+}
